@@ -1,0 +1,35 @@
+version: '2'
+services:
+  mongo:
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db/mongo:/data/db
+    image: "mongo"
+    networks:
+      - clara-db
+    command: "mongod --replSet my-mongo-set"
+  neo4j:
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    volumes:
+      - ./db/neo4j:/data
+    image: "neo4j"
+    networks:
+      - clara-db
+    environment:
+      NEO4J_AUTH: none
+  mongoconnector:
+    depends_on:
+      - "mongo"
+      - "neo4j"
+    links:
+      - "mongo"
+      - "neo4j"
+    image: "mongo-connector"
+    networks:
+      - clara-db
+
+networks:
+  clara-db:
